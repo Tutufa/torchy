@@ -5,9 +5,6 @@ import torch.nn as nn
 from torch.autograd import Variable
 import torchvision.utils as vutils
 
-import logging
-py_logger = logging.getLogger('gan_training_logging')
-
 
 class MNISTDataset:
     def __init__(self, path_to_data: str, batch_size: int=128):
@@ -33,7 +30,6 @@ def log_step(step, gen, gen_loss, discr_loss, z_dim, device, logger, scalar_peri
     if scalar_period % 100 == 0:
         logger.add_scalars('gan', {'gen_loss': gen_loss,
                                    'discr_loss': discr_loss}, step)
-        py_logger.info('Logging scalar, step = {}'.format(step))
 
     if img_period % 250 == 0:
         gen.eval()
@@ -43,14 +39,9 @@ def log_step(step, gen, gen_loss, discr_loss, z_dim, device, logger, scalar_peri
         logger.add_image('Samples', x, step)
 
         gen.train()
-        py_logger.info('Logging img, step = {}'.format(step))
 
 
-bce_loss = nn.BCELoss()
-
-
-# Simple GAN (CE loss) Generator step
-def bce_gen_step(gen, discr, z, gen_solver, device, loss=bce_loss):
+def base_gen_step(gen, discr, z, gen_solver, device, loss=None):
     gen.zero_grad()
 
     fake_examples = gen(z)
@@ -64,7 +55,7 @@ def bce_gen_step(gen, discr, z, gen_solver, device, loss=bce_loss):
     return batch_loss
 
 
-def bce_discr_step(gen, discr, z, batch, discr_solver, device, loss=bce_loss):
+def base_discr_step(gen, discr, z, batch, discr_solver, device, loss=None):
     discr.zero_grad()
 
     fake_examples = gen(z)
@@ -83,21 +74,33 @@ def bce_discr_step(gen, discr, z, batch, discr_solver, device, loss=bce_loss):
     return batch_loss
 
 
+bce_loss = nn.BCELoss()
 mse_loss = nn.MSELoss()
 
 
-# Better GAN (LS loss)
+# Simple GAN (CE loss)
+def bce_gen_step(gen, discr, z, gen_solver, device, loss=bce_loss):
+    batch_loss = base_gen_step(gen, discr, z, gen_solver, device, loss=loss)
+    return batch_loss
+
+
+def bce_discr_step(gen, discr, z, batch, discr_solver, device, loss=bce_loss):
+    batch_loss = base_discr_step(gen, discr, z, batch, discr_solver, device, loss=loss)
+    return batch_loss
+
+
+# LS-GAN (LS loss)
 def ls_gen_step(gen, discr, z, gen_solver, device, loss=mse_loss):
-    batch_loss = bce_gen_step(gen, discr, z, gen_solver, device, loss=loss)
+    batch_loss = base_gen_step(gen, discr, z, gen_solver, device, loss=loss)
     return batch_loss
 
 
 def ls_discr_step(gen, discr, z, batch, discr_solver, device, loss=mse_loss):
-    batch_loss = bce_discr_step(gen, discr, z, batch, discr_solver, device, loss=loss)
+    batch_loss = base_discr_step(gen, discr, z, batch, discr_solver, device, loss=loss)
     return batch_loss
 
 
-# Even Better GAN (Wasserstein loss)
+# W-GAN-GP (Wasserstein loss)
 def wass_gen_step():
     pass
 
