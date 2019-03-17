@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+from torch.nn import functional
 from torch.nn.functional import interpolate
 
 
@@ -20,38 +20,15 @@ class MNISTGenerator(nn.Module):
         self.conv_2 = nn.Conv2d(in_channels=64, out_channels=1, kernel_size=3, stride=1, padding=1)
 
     def forward(self, in_tensor: torch.Tensor):
-        x = F.relu(self.bn_1(self.dense_1(in_tensor)))
-        x = F.relu(self.bn_2(self.dense_2(x)))
+        x = functional.relu(self.bn_1(self.dense_1(in_tensor)))
+        x = functional.relu(self.bn_2(self.dense_2(x)))
 
         x = x.view((-1, 128, 7, 7))
         
         x = interpolate(input=x, scale_factor=2)
-        x = F.relu(self.conv_1_bn(self.conv_1(x)))
+        x = functional.relu(self.conv_1_bn(self.conv_1(x)))
 
         x = interpolate(input=x, scale_factor=2)
         x = self.conv_2(x)
         
         return torch.sigmoid(x)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

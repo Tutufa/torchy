@@ -5,23 +5,14 @@ from tensorboardX import SummaryWriter
 
 from generators import MNISTGenerator
 from discriminators import MNISTDiscriminator
-from helpers import MNISTDataset
+from utils import MNISTDataset
+from helpers import gan_train_step
 from helpers import bce_gen_step, bce_discr_step
 from helpers import ls_gen_step, ls_discr_step
-from helpers import log_step
 
 import logging
 logging.basicConfig(level=logging.INFO)
 py_logger = logging.getLogger('gan_training_logging')
-
-
-def train_step(gen_step, discr_step, gen, discr, batch, z, gen_solver, discr_solver, device, step, logger):
-    # generator step
-    gen_loss = gen_step(gen, discr, z, gen_solver, device)
-    # discriminator update
-    discr_loss = discr_step(gen, discr, z, batch, discr_solver, device)
-    # logging
-    log_step(step, gen, gen_loss, discr_loss, z_dim, device, logger)
 
 
 loss_type = 'bce'
@@ -36,6 +27,7 @@ elif loss_type == 'ls':
     _discr_step = ls_discr_step
 else:
     raise NotImplemented
+
 
 n_epoch = 32
 z_dim = 96
@@ -64,10 +56,10 @@ for epoch in range(0, n_epoch):
         z = Variable(torch.rand((batch.shape[0], z_dim)).to(device))
         batch = batch.to(device)
 
-        train_step(gen_step=_gen_step, discr_step=_discr_step,
-                   gen=gen, discr=discr, batch=batch, z=z,
-                   gen_solver=gen_solver, discr_solver=discr_solver,
-                   device=device, step=step_n, logger=writer)
+        gan_train_step(gen_step=_gen_step, discr_step=_discr_step,
+                       gen=gen, discr=discr, batch=batch, z=z,
+                       gen_solver=gen_solver, discr_solver=discr_solver,
+                       device=device, step=step_n, logger=writer)
 
         step_n += 1
         if step_n % 250 == 0:
