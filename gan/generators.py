@@ -5,10 +5,8 @@ from torch.nn.functional import interpolate
 
 
 class MNISTGenerator(nn.Module):
-    def __init__(self, capacity: int=128):
+    def __init__(self):
         super(MNISTGenerator, self).__init__()
-
-        self.capacity = capacity
 
         self.dense_1 = nn.Linear(in_features=96, out_features=1024)
         self.bn_1 = nn.BatchNorm1d(1024)
@@ -25,14 +23,14 @@ class MNISTGenerator(nn.Module):
         x = F.relu(self.bn_1(self.dense_1(in_tensor)))
         x = F.relu(self.bn_2(self.dense_2(x)))
 
-        x = x.view((-1, 7, 7, 128))
-
+        x = x.view((-1, 128, 7, 7))
+        
         x = interpolate(input=x, scale_factor=2)
         x = F.relu(self.conv_1_bn(self.conv_1(x)))
 
         x = interpolate(input=x, scale_factor=2)
         x = self.conv_2(x)
-
+        
         return torch.sigmoid(x)
 
 
