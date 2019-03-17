@@ -7,7 +7,7 @@ Implementation of simple DC-GAN with different loss criterion's
 MNIST
 ----
 
-CE-Gan training curve:
+CE-GAN training curve:
 
 
 Results:
@@ -15,7 +15,7 @@ Results:
 
 ----
 
-LS-Gan training curve:
+LS-GAN training curve:
 
 
 Results:
