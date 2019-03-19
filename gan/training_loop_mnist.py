@@ -6,9 +6,9 @@ from tensorboardX import SummaryWriter
 from generators import MNISTGenerator
 from discriminators import MNISTDiscriminator
 from utils import MNISTDataset
-from helpers import gan_train_step
-from helpers import bce_gen_step, bce_discr_step
-from helpers import ls_gen_step, ls_discr_step
+from gan_helpers import gan_train_step
+from gan_helpers import bce_gen_step, bce_discr_step
+from gan_helpers import ls_gen_step, ls_discr_step
 
 import logging
 logging.basicConfig(level=logging.INFO)
