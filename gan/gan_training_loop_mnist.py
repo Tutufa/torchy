@@ -3,12 +3,13 @@ import torch.optim as solvers
 from torch.autograd import Variable
 from tensorboardX import SummaryWriter
 
-from generators import MNISTGenerator
-from discriminators import MNISTDiscriminator
-from utils import MNISTDataset
 from gan_helpers import gan_train_step
 from gan_helpers import bce_gen_step, bce_discr_step
 from gan_helpers import ls_gen_step, ls_discr_step
+
+from generators import MNISTGenerator
+from discriminators import MNISTDiscriminator
+from utils import MNISTDataset
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -32,9 +33,9 @@ else:
 n_epoch = 32
 z_dim = 96
 step_n = 0
-mnist_path = '/Users/kovalenko/PycharmProjects/torchy/data/mnist/mnist.pkl'
+mnist_path = '/storage_disk2/experiments/torchy/data/mnist/mnist.pkl'
 
-device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+device = 'cuda:2' if torch.cuda.is_available() else 'cpu'
 writer = SummaryWriter(comment=logger_prefix)
 
 

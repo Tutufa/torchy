@@ -1,12 +1,14 @@
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
+from torch import optim
+import typing
+from torchvision import utils as vutils
 
-from training_loop_mnist import z_dim
-from utils import log_step
 
+def base_gen_step(gen: nn.Module, discr: nn.Module, z: Variable, gen_solver: optim.Optimizer,
+                  device: str, loss: typing.Callable =None):
 
-def base_gen_step(gen, discr, z, gen_solver, device, loss=None):
     gen.zero_grad()
 
     fake_examples = gen(z)
@@ -80,4 +82,19 @@ def gan_train_step(gen_step, discr_step, gen, discr, batch, z, gen_solver, discr
     # discriminator update
     discr_loss = discr_step(gen, discr, z, batch, discr_solver, device)
     # logging
-    log_step(step, gen, gen_loss, discr_loss, z_dim, device, logger)
+    log_gan_step(step, gen, gen_loss, discr_loss, z.shape[1], device, logger)
+
+
+def log_gan_step(step, gen, gen_loss, discr_loss, z_dim, device, logger, scalar_period=100, img_period=250):
+    if step % scalar_period == 0:
+        logger.add_scalars('gan', {'gen_loss': gen_loss,
+                                   'discr_loss': discr_loss}, step)
+
+    if step % img_period == 0:
+        gen.eval()
+        z = Variable(torch.rand((10 * 10, z_dim)).to(device))
+        fake_examples = gen(z)
+        x = vutils.make_grid(fake_examples, nrow=10, normalize=True, scale_each=True)
+        logger.add_image('Samples', x, step)
+
+        gen.train()
