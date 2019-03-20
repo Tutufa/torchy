@@ -17,6 +17,11 @@ py_logger = logging.getLogger('gan_training_logging')
 
 
 loss_type = 'bce'
+n_epoch = 32
+z_dim = 96
+step_n = 0
+mnist_path = '/storage_disk2/experiments/torchy/data/mnist/mnist.pkl'
+
 
 if loss_type == 'bce':
     logger_prefix = '_DC_BCE_GAN'
@@ -28,12 +33,6 @@ elif loss_type == 'ls':
     _discr_step = ls_discr_step
 else:
     raise NotImplemented
-
-
-n_epoch = 32
-z_dim = 96
-step_n = 0
-mnist_path = '/storage_disk2/experiments/torchy/data/mnist/mnist.pkl'
 
 device = 'cuda:2' if torch.cuda.is_available() else 'cpu'
 writer = SummaryWriter(comment=logger_prefix)

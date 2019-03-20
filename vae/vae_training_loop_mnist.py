@@ -46,7 +46,7 @@ for epoch in range(0, n_epoch):
         if step_n % 250 == 0:
             py_logger.info('Epoch {} | Step {}'.format(epoch, step_n))
 
-    log_vae_step(step_n, writer, loss=epoch_loss/len(train_dl.dataset))
+    log_vae_step(step_n, writer, model=model, loss=epoch_loss/len(train_dl.dataset))
 
     # eval
     for batch_n, (batch, _) in enumerate(valid_dl):
@@ -56,7 +56,7 @@ for epoch in range(0, n_epoch):
         if batch_n == 0:
             log_vae_step(step_n, writer, model=model, eval_batch=batch, img=True)
 
-    log_vae_step(step_n, writer, loss=eval_loss / len(valid_dl.dataset), train=False)
+    log_vae_step(step_n, writer, model=model, loss=eval_loss / len(valid_dl.dataset), train=False)
 
 
 

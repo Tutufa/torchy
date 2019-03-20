@@ -1,15 +1,20 @@
 import torch
+import torch.nn as nn
 from torch.nn import functional
+from torch import optim
+from torch.autograd import Variable
 from torchvision import utils as vutils
+from tensorboardX import SummaryWriter
+import typing
 
 
-def vae_loss(x_hat, x, mean, log_var):
+def vae_loss(x_hat: Variable, x: Variable, mean: Variable, log_var: Variable) -> Variable:
     reconstruction_loss = functional.binary_cross_entropy(x_hat, x, reduction='sum')
     latent_reg = -0.5 * torch.sum(1 + log_var - mean.pow(2) - log_var.exp())
     return reconstruction_loss + latent_reg
 
 
-def vae_train_step(model, batch, vae_loss, solver):
+def vae_train_step(model: nn.Module, batch: Variable, vae_loss: typing.Callable, solver: optim.Optimizer) -> float:
     model.zero_grad()
 
     batch_hat, mean, log_var = model(batch)
@@ -18,12 +23,12 @@ def vae_train_step(model, batch, vae_loss, solver):
     batch_loss = loss.detach().item()
 
     loss.backward()
-    solver.step()
+    solver.step(closure=None)
 
     return batch_loss
 
 
-def vae_eval_step(model, batch, vae_loss):
+def vae_eval_step(model: nn.Module, batch: Variable, vae_loss: typing.Callable) -> float:
     model.eval()
 
     batch_hat, mean, log_var = model(batch)
@@ -35,8 +40,9 @@ def vae_eval_step(model, batch, vae_loss):
     return batch_loss
 
 
-def log_vae_step(step, logger, model=None, eval_batch=None, eval_shape=(1, 28, 28),
-                 loss=None, train=True, img=False):
+def log_vae_step(step: int, logger: SummaryWriter, model: nn.Module, eval_batch: Variable=None,
+                 eval_shape: typing.Tuple[int, int, int]=(1, 28, 28),
+                 loss: float=None, train: bool=True, img: bool=False) -> None:
 
     if img:
         model.eval()

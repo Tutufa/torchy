@@ -1,10 +1,11 @@
 import pickle
 import torch
 from torch.utils.data import TensorDataset, DataLoader
+import typing
 
 
 class MNISTDataset:
-    def __init__(self, path_to_data: str, batch_size: int=128, flatten=False):
+    def __init__(self, path_to_data: str, batch_size: int=128, flatten: bool=False):
         self.path = path_to_data
         self.bs = batch_size
         if not flatten:
@@ -12,7 +13,7 @@ class MNISTDataset:
         else:
             self.shape = (-1, 784)
 
-    def get_iterators(self):
+    def get_iterators(self) -> typing.Tuple[DataLoader, DataLoader]:
 
         with open(self.path, 'rb') as f:
             ((x_train, y_train), (x_valid, y_valid), _) = pickle.load(f, encoding="latin-1")

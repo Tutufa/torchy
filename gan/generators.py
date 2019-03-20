@@ -19,7 +19,7 @@ class MNISTGenerator(nn.Module):
 
         self.conv_2 = nn.Conv2d(in_channels=64, out_channels=1, kernel_size=3, stride=1, padding=1)
 
-    def forward(self, in_tensor: torch.Tensor):
+    def forward(self, in_tensor: torch.Tensor) -> torch.Tensor:
         x = functional.relu(self.bn_1(self.dense_1(in_tensor)))
         x = functional.relu(self.bn_2(self.dense_2(x)))
 

@@ -14,7 +14,7 @@ class MNISTDiscriminator(nn.Module):
         self.conv_3 = nn.Conv2d(in_channels=capacity*2, out_channels=capacity*4, kernel_size=3, stride=2, padding=1)
         self.conv_4 = nn.Conv2d(in_channels=capacity*4, out_channels=1, kernel_size=4, stride=1, padding=0)
 
-    def forward(self, in_tensor: torch.Tensor):
+    def forward(self, in_tensor: torch.Tensor) -> torch.Tensor:
         x = functional.leaky_relu(self.conv_1(in_tensor), 0.1)
         x = functional.leaky_relu(self.conv_2(x), 0.1)
         x = functional.leaky_relu(self.conv_3(x), 0.1)
