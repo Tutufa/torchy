@@ -14,27 +14,27 @@ def vae_loss(x_hat: Variable, x: Variable, mean: Variable, log_var: Variable) ->
     return reconstruction_loss + latent_reg
 
 
-def vae_train_step(model: nn.Module, batch: Variable, vae_loss: typing.Callable, solver: optim.Optimizer) -> float:
+def vae_train_step(model: nn.Module, batch: Variable, loss: typing.Callable, solver: optim.Optimizer) -> float:
     model.zero_grad()
 
     batch_hat, mean, log_var = model(batch)
 
-    loss = vae_loss(batch_hat, batch, mean, log_var)
-    batch_loss = loss.detach().item()
+    vae_batch_loss = loss(batch_hat, batch, mean, log_var)
+    batch_loss = vae_batch_loss.detach().item()
 
-    loss.backward()
+    vae_batch_loss.backward()
     solver.step(closure=None)
 
     return batch_loss
 
 
-def vae_eval_step(model: nn.Module, batch: Variable, vae_loss: typing.Callable) -> float:
+def vae_eval_step(model: nn.Module, batch: Variable, loss: typing.Callable) -> float:
     model.eval()
 
     batch_hat, mean, log_var = model(batch)
 
-    loss = vae_loss(batch_hat, batch, mean, log_var)
-    batch_loss = loss.detach().item()
+    vae_batch_loss = loss(batch_hat, batch, mean, log_var)
+    batch_loss = vae_batch_loss.detach().item()
 
     model.train()
     return batch_loss

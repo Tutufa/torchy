@@ -15,9 +15,9 @@ n_epoch = 64
 step_n = 0
 mnist_path = '/storage_disk2/experiments/torchy/data/mnist/mnist.pkl'
 
+
 device = 'cuda:2' if torch.cuda.is_available() else 'cpu'
 writer = SummaryWriter(comment='_VAE')
-
 
 mnist = MNISTDataset(path_to_data=mnist_path, flatten=True)
 train_dl, valid_dl = mnist.get_iterators()
@@ -57,18 +57,3 @@ for epoch in range(0, n_epoch):
             log_vae_step(step_n, writer, model=model, eval_batch=batch, img=True)
 
     log_vae_step(step_n, writer, model=model, loss=eval_loss / len(valid_dl.dataset), train=False)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
